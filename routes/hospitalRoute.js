@@ -1,5 +1,5 @@
 const express = require("express");
-// const { ruleUpdateUserLoggerValidator } = require("../utils/validator/users");
+const { ruleGetOneHospital } = require("../utils/validator/hospital");
 
 const {
   getAllHospitals,
@@ -9,6 +9,6 @@ const {
 const router = express.Router();
 
 router.get("/", getAllHospitals);
-router.get("/:id", getOneHospital);
+router.get("/:id", ruleGetOneHospital, getOneHospital);
 
 module.exports = router;

@@ -21,10 +21,7 @@ const {
 
 const router = express.Router();
 
-router
-  .route("/signup")
-  // .get(getUser)
-  .post(ruleSignUpValidator, signup);
+router.route("/signup").post(ruleSignUpValidator, signup);
 
 router.route("/login").post(ruleLoginValidator, login);
 

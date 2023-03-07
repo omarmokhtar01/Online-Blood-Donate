@@ -39,6 +39,7 @@ exports.signup = asyncHandler(async (req, res) => {
   });
   // Generate Token
   const token = generateToken(user._id);
+  // Generate Cookie
   res.status(201).json({ data: sanitizeUserSignup(user), token });
 });
 
@@ -64,6 +65,7 @@ exports.authProtect = asyncHandler(async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer")
   ) {
     token = req.headers.authorization.split(" ")[1];
+    console.log(token);
   }
   if (!token) {
     new ApiError(401, "Please Login first to access this route");

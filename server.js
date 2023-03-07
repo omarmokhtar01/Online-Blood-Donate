@@ -2,14 +2,16 @@
 const path = require("path");
 
 // 2- serv part modules
-const dotenv = require("dotenv");
-dotenv.config({ path: "config.env" });
+require("dotenv").config();
 const express = require("express"),
+  cors = require("cors"),
+  compression = require("compression"),
   morgan = require("morgan"),
   hpp = require("hpp"),
   mongoSanitize = require("express-mongo-sanitize"),
   xss = require("xss-clean"),
   toobusy = require("toobusy-js"),
+  rateLimit = require("express-rate-limit"),
   helmet = require("helmet");
 
 // 3- modules import from folders
@@ -25,6 +27,13 @@ dbConnection();
 
 // Express App
 const app = express();
+
+// Enable other domains to access my application
+app.use(cors());
+app.options("*", cors());
+
+// compress all responses
+app.use(compression());
 
 // Middlewares
 // Helmet helps you secure your Express apps by setting various HTTP headers. It's not a silver bullet, but it can help!
@@ -45,18 +54,22 @@ app.use(mongoSanitize());
 // to convert script come form body to string
 app.use(xss());
 
+const limiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 10, // Limit each IP to 10 requests per `window` (here, per 5 minutes)
+  message:
+    "Too many accounts created from this IP, please try again after an hour",
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+// Apply the rate limiting middleware to all requests
+app.use("/api", limiter);
+
 // middleware to protect against HTTP Parameter Pollution attacks
 app.use(
   hpp({
-    whitelist: [
-      "quantity",
-      "sold",
-      "price",
-      "priceAfterDiscount",
-      "colors",
-      "ratingsAverage",
-      "ratingsQuantity",
-    ],
+    whitelist: ["name", "slug", "address", "city"],
   })
 );
 

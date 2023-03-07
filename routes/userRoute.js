@@ -1,5 +1,8 @@
 const express = require("express");
-const { ruleUpdateUserLoggerValidator } = require("../utils/validator/users");
+const {
+  ruleUpdateData,
+  ruleGetUserProfile,
+} = require("../utils/validator/users");
 
 const {
   specificUser,
@@ -16,7 +19,7 @@ const router = express.Router();
 router.use(authProtect, allowedTo("user"));
 router
   .route("/myProfile")
-  .get(getProfile, specificUser)
-  .put(ruleUpdateUserLoggerValidator, updateUserData);
+  .get(ruleGetUserProfile, getProfile, specificUser)
+  .put(ruleUpdateData, updateUserData);
 
 module.exports = router;
